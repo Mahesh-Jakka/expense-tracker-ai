@@ -1,5 +1,5 @@
 import { Expense } from '@/types';
-import { formatDate, formatCurrency } from './format';
+import { formatDate } from './format';
 
 export function exportToCSV(expenses: Expense[], filename: string = 'expenses'): void {
   if (expenses.length === 0) {

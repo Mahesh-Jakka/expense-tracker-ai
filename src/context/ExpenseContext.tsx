@@ -63,6 +63,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
       status: data.paymentMethod === 'company_card' ? 'approved' : 'pending',
       submittedBy: user.id,
       submittedByName: user.username,
+      receiptUrl: data.receipt || undefined,
     };
 
     setAllExpenses((prev) => {
@@ -85,6 +86,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
               paymentMethod: data.paymentMethod,
               status: data.paymentMethod === 'company_card' ? 'approved' as const : expense.status,
               updatedAt: new Date().toISOString(),
+              receiptUrl: data.receipt || expense.receiptUrl,
             }
           : expense
       );

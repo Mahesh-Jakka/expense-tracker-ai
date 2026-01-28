@@ -12,7 +12,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts';
 import { useExpenses } from '@/context/ExpenseContext';
 import { formatCurrency } from '@/utils/format';

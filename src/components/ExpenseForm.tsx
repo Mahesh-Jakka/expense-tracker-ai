@@ -28,8 +28,10 @@ export default function ExpenseForm({ editId }: ExpenseFormProps) {
     category: 'Food',
     date: getCurrentDateString(),
     paymentMethod: 'company_card',
+    receipt: '',
   });
 
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
@@ -42,7 +44,11 @@ export default function ExpenseForm({ editId }: ExpenseFormProps) {
           category: expense.category,
           date: expense.date,
           paymentMethod: expense.paymentMethod,
+          receipt: '',
         });
+        if (expense.receiptUrl) {
+          setReceiptPreview(expense.receiptUrl);
+        }
       }
     }
   }, [editId, getExpenseById]);
@@ -103,10 +109,28 @@ export default function ExpenseForm({ editId }: ExpenseFormProps) {
           category: 'Food',
           date: getCurrentDateString(),
           paymentMethod: 'company_card',
+          receipt: '',
         });
+        setReceiptPreview(null);
         setShowSuccess(false);
       }
     }, 1000);
+  };
+
+  const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File must be under 5MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setReceiptPreview(result);
+      setFormData((prev) => ({ ...prev, receipt: result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,6 +311,47 @@ export default function ExpenseForm({ editId }: ExpenseFormProps) {
         />
         {errors.date && (
           <p className="mt-2 text-sm text-red-600">{errors.date}</p>
+        )}
+      </div>
+
+      {/* Receipt Upload */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Receipt (optional)
+        </label>
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={handleReceiptChange}
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+        />
+        {receiptPreview && (
+          <div className="mt-3">
+            {receiptPreview.startsWith('data:image') ? (
+              <img
+                src={receiptPreview}
+                alt="Receipt preview"
+                className="max-h-40 rounded-lg border border-gray-200"
+              />
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                PDF receipt attached
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setReceiptPreview(null);
+                setFormData((prev) => ({ ...prev, receipt: '' }));
+              }}
+              className="mt-2 text-sm text-red-600 hover:text-red-700"
+            >
+              Remove receipt
+            </button>
+          </div>
         )}
       </div>
 

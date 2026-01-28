@@ -21,6 +21,7 @@ export interface Expense {
   status: ExpenseStatus;
   submittedBy: string;
   submittedByName: string;
+  receiptUrl?: string;
 }
 
 export interface ExpenseFormData {
@@ -29,6 +30,7 @@ export interface ExpenseFormData {
   category: Category;
   date: string;
   paymentMethod: PaymentMethod;
+  receipt?: string;
 }
 
 export interface ExpenseFilters {

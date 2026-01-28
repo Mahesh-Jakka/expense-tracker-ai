@@ -17,6 +17,7 @@ export default function ExpenseList() {
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewReceiptUrl, setViewReceiptUrl] = useState<string | null>(null);
 
   const filteredAndSortedExpenses = useMemo(() => {
     let result = getFilteredExpenses(startDate, endDate, selectedCategory, searchQuery);
@@ -283,6 +284,17 @@ export default function ExpenseList() {
                 </div>
 
                 <div className="flex items-center gap-1 flex-shrink-0">
+                  {expense.receiptUrl && (
+                    <button
+                      onClick={() => setViewReceiptUrl(expense.receiptUrl!)}
+                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="View Receipt"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
+                    </button>
+                  )}
                   <Link
                     href={`/edit/${expense.id}`}
                     className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
@@ -305,6 +317,27 @@ export default function ExpenseList() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Receipt View Modal */}
+      {viewReceiptUrl && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setViewReceiptUrl(null)}>
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Receipt</h3>
+              <button onClick={() => setViewReceiptUrl(null)} className="p-1 text-gray-400 hover:text-gray-600 rounded">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {viewReceiptUrl.startsWith('data:image') ? (
+              <img src={viewReceiptUrl} alt="Receipt" className="w-full rounded-lg" />
+            ) : (
+              <iframe src={viewReceiptUrl} className="w-full h-[70vh] rounded-lg border" />
+            )}
+          </div>
         </div>
       )}
 
