@@ -14,6 +14,7 @@ interface FormErrors {
   amount?: string;
   description?: string;
   date?: string;
+  receipt?: string;
 }
 
 export default function ExpenseForm({ editId }: ExpenseFormProps) {
@@ -75,6 +76,10 @@ export default function ExpenseForm({ editId }: ExpenseFormProps) {
 
     if (!formData.date) {
       newErrors.date = 'Date is required';
+    }
+
+    if (!formData.receipt && !receiptPreview) {
+      newErrors.receipt = 'Receipt is required';
     }
 
     setErrors(newErrors);
@@ -317,14 +322,20 @@ export default function ExpenseForm({ editId }: ExpenseFormProps) {
       {/* Receipt Upload */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Receipt (optional)
+          Receipt <span className="text-red-500">*</span>
         </label>
         <input
           type="file"
           accept="image/*,application/pdf"
-          onChange={handleReceiptChange}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+          onChange={(e) => {
+            handleReceiptChange(e);
+            if (errors.receipt) setErrors({ ...errors, receipt: undefined });
+          }}
+          className={`block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 ${errors.receipt ? 'border border-red-300 rounded-lg' : ''}`}
         />
+        {errors.receipt && (
+          <p className="mt-2 text-sm text-red-600">{errors.receipt}</p>
+        )}
         {receiptPreview && (
           <div className="mt-3">
             {receiptPreview.startsWith('data:image') ? (
